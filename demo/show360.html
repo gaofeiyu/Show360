@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../../src/style/style.css"/>
+    <script src="../src/bigeye.js"></script>
+    <style>
+        body{ overflow: hidden; margin: 0; padding: 0; background: #3f474f;}
+        ol,li{ list-style: none;}
+        #show360,#loading{ position: absolute; width: 960px; height: 540px; overflow: hidden; top: 50%; left: 50%; margin: -270px 0 0 -480px; text-align: center; line-height: 540px; }
+        #show360 ol{ width: 100%; height: 100%;}
+        #show360 li{ width: 100%; height: 100%;}
+        #show360 img{ width: 100%;}
+    </style>
+</head>
+<body>
+<header id="demoHead" class="demo-head">
+    <div class="demo-head-base">
+        <div class="demo-title">BigEye</div>
+        <div class="demo-info">
+            <div class="demo-name">Show360</div>
+            <div class="demo-show-details">查看更多说明</div>
+        </div>
+    </div>
+    <div class="demo-head-extend">
+        <h2>关于 Show360</h2>
+        <p>物体360°拖动展示</p>
+        <ul>
+            <li>开发者：Goofy</li>
+            <li>图片设计来源：<a href="http://heartcode.robertpataki.com/360-image-slider/">http://heartcode.robertpataki.com/360-image-slider/</a></li>
+        </ul>
+    </div>
+</header>
+<div id="container">
+    <a class="GitHub-fork" href="https://github.com/gaofeiyu/BigEye" target="_blank" style="background:transparent;"><img style="position:relative; left: 0; border: 0; z-index:2;" src="http://view.gaofeiyu.com/src/images/github/forkme_left_darkblue.png" alt="Fork me on GitHub"></a>
+    <div id="loading"></div>
+    <div id="show360"></div>
+</div>
+<script>
+    var bigEye = new BigEye();
+    var show360 = bigEye.show360({
+        element : '#show360',
+        imgPath : 'images/show360/',
+        loadProcess : function(num){
+            document.getElementById('loading').innerText = num+'%';
+        },
+        loadComplete: function(){
+            document.getElementById('loading').remove();
+        }
+    });
+</script>
+</body>
+</html>
