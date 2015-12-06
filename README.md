@@ -33,8 +33,8 @@ var show360 = bigEye.show360({
 <h2>属性说明</h2>
 <pre><code>
     element: '',                // 目标元素
-    width: '',                  // 元素宽度，不设置为自适应 **还没做
-    height: '',                 // 元素高度，不设置为自适应 **还没做
+    width: '',                  // 元素宽度
+    height: '',                 // 元素高度
     rotateRange: '2',           // 旋转单张角度
     imgPath: 'pic/',            // 图片相对路径
     imgPrefix: 'threesixty_',   // 图片名称前缀

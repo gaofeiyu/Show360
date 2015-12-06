@@ -5,24 +5,36 @@
     <title>Document</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="../../src/style/style.css"/>
-    <script src="../src/bigeye.js"></script>
+    <script src="http://view.gaofeiyu.com/src/lib/qr.js"></script>
     <style>
         body{ overflow: hidden; margin: 0; padding: 0; background: #3f474f;}
         ol,li{ list-style: none;}
         #show360,#loading{ position: absolute; width: 960px; height: 540px; overflow: hidden; top: 50%; left: 50%; margin: -270px 0 0 -480px; text-align: center; line-height: 540px; }
-        #show360 ol{ width: 100%; height: 100%;}
-        #show360 li{ width: 100%; height: 100%;}
-        #show360 img{ width: 100%;}
+        #show360 img{ width: 100%; vertical-align: top;}
     </style>
 </head>
 <body>
 <header id="demoHead" class="demo-head">
     <div class="demo-head-base">
         <div class="demo-title">BigEye</div>
+        <div class="demo-trigger-phone">
+            用手持设备查看
+            <div class="demo-page-qr" id="demoPageQr"></div>
+        </div>
         <div class="demo-info">
             <div class="demo-name">Show360</div>
             <div class="demo-show-details">查看更多说明</div>
         </div>
+        <script>
+            var qr = new QRCode(document.getElementById('demoPageQr'), {
+                width : 120,
+                height : 120,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+            });
+            qr.makeCode(window.location.href);
+        </script>
     </div>
     <div class="demo-head-extend">
         <h2>关于 Show360</h2>
@@ -38,6 +50,7 @@
     <div id="loading"></div>
     <div id="show360"></div>
 </div>
+<script src="../src/bigeye.js"></script>
 <script>
     var bigEye = new BigEye();
     var show360 = bigEye.show360({

@@ -10,6 +10,60 @@
 
     function Show360(options){
         var s360 = this;
+
+
+
+        s360.setDefaults = function(options){
+            self.extend(true,defaults,options);
+        };
+        s360.easeStop = function(now,callback){
+            var r = range > 0 ? 1 : -1;
+            if(now<Math.abs(range)*2){
+                opt.easeTime = setTimeout(function(){
+                    s360.turnRotate( range+r-Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)) );
+                    s360.easeStop(now+1,callback);
+                },Math.ceil(self.tween.Circ.easeIn(now,10,30,Math.abs(range)*2)));
+                //console.log(Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)),Math.ceil(self.tween.Circ.easeIn(now,1,20,Math.abs(range)*2)));
+            }else{
+                if(typeof callback != 'undefined'){
+                    callback.call(this,range);
+                }
+            }
+        };
+        s360.turnRotate = function(range){
+            opt.ele_ol.childNodes[opt.active - 1].style.visibility = "hidden";
+            opt.active -= range;
+            if(opt.active < 1){
+                opt.active = opt.imgTotal - 1 + opt.active % opt.imgTotal;
+            }
+            if(opt.active > opt.imgTotal){
+                opt.active = opt.active % opt.imgTotal +1;
+            }
+            opt.ele_ol.childNodes[opt.active - 1].style.visibility = "visible";
+        };
+        s360.setSize = function(width,height,unit){
+            var u = typeof unit == 'undefined' ? 'px' : unit;
+            //if(typeof width != 'number' || typeof height != 'number'){
+            //    return console.warn('请输入有效的number类型');
+            //}
+            if(typeof width == 'number' && typeof height == 'number'){
+                defaults.width = width == '' ? '100%' : width+''+u;
+                defaults.height = height == '' ? '100%' : height+''+u;
+            }else{
+                defaults.width = width == '' ? '100%' : width;
+                defaults.height = height == '' ? '100%' : height;
+            }
+            console.log(defaults.width,defaults.height);
+        };
+        s360.autoPlay = function(f){
+            if(f){
+                s360.turnRotate(1);
+                opt.autoPlayTime = setTimeout(function(){
+                    s360.autoPlay(defaults.autoPlay);
+                },defaults.autoPlaySpeed)
+            }
+        };
+
         var defaults = {
             element: '',                // 目标元素
             width: '',                  // 元素宽度，不设置为自适应
@@ -29,7 +83,7 @@
 
         };
         self.extend(true,defaults,options);
-
+        s360.setSize(defaults.width,defaults.height);
         var consts = {
             rotate: 360
         };
@@ -88,6 +142,7 @@
         self.addEvent(opt.ele,'gesturestart',gestureStart);
         self.addEvent(opt.ele,'gestureend',gestureEnd);
 
+        s360.autoPlay(defaults.autoPlay);
         // 事件过程体
 
         function mouseDown(e){
@@ -111,25 +166,40 @@
             }
             opt.moveLock = true;
         }
+        function getElementMouseCoords(e,ele){
+            var w = ele.clientWidth,
+                h = ele.clientHeight,
+                x = e.pageX,
+                y = e.pageY,
+                ot = ele.offsetTop,
+                ol = ele.offsetLeft,
+                r = {x:0,y:0};
+            r.x = (x - ol) < 0 ? 0 : (x - ol) > w ? w : x - ol;
+            r.y = (y - ot) < 0 ? 0 : (y - ot) > h ? h : y - ot;
+            return r;
+        }
         function mouseMove(e){
             e.preventDefault();
-            var x = e.pageX,
-                y = e.pageY;
+            var coords = {
+                x : e.pageX,
+                y : e.pageY
+            };
             if(!opt.moveLock){
                 if(typeof e.touches != 'undefined'){
-                    x = e.touches[0].pageX;
+                    coords.x = e.touches[0].pageX;
                 }
                 if(eleX == -1){
-                    eleX = x;
+                    eleX = coords.x;
                     return;
                 }
-                range = parseInt((x - eleX) / defaults.rotateRange);
+                range = parseInt((coords.x - eleX) / defaults.rotateRange);
                 s360.turnRotate(range);
-                eleX = x;
+                eleX = coords.x;
             }else{
+                coords = self.getElementMouseCoords(e,opt.ele_ol);
                 if(typeof e.touches == 'undefined'){
-                    var ox = parseInt((x/opt.ele.clientWidth*opt.gesture.scale)*100)+'%',
-                        oy = parseInt((y/opt.ele.clientHeight*opt.gesture.scale)*100)+'%';
+                    var ox = parseInt((coords.x/opt.ele.clientWidth*opt.gesture.scale)*100)+'%',
+                        oy = parseInt((coords.y/opt.ele.clientHeight*opt.gesture.scale)*100)+'%';
                     opt.ele_ol.style.transformOrigin = ox+" "+oy;
                 }
             }
@@ -203,16 +273,17 @@
         // 渲染组件Html结构
         function _renderList(){
             var list = document.createElement('ol');
-            list.setAttribute('style','position:absolute; top:0; left:0; visibility:hidden;');
+            list.setAttribute('style','position:absolute; top:0; left:0; visibility:hidden; width: '+defaults.width+'; height: '+defaults.height+'; transition: all .1s; -webkit-transition: all .1s ease-out;');
             for(var i = 1; i<=opt.imgTotal; i++){
                 var li = document.createElement('li');
                 var visibility = 'visibility: hidden;';
                 if(i == defaults.startIndex){
                     visibility = '';
                 }
-                li.setAttribute('style','position:absolute; left:0; top:0;'+visibility);
+                li.setAttribute('style','position:absolute; left:0; top:0; width:100%; height:100%;'+visibility);
                 var img = new Image();
                 img.src = defaults.imgPath + defaults.imgPrefix + i + '.' + defaults.imgType;
+                img.setAttribute('style','width:100%;');
                 li.appendChild(img);
                 imgLoadState.imgArr.push(img);
                 list.appendChild(li);
@@ -242,49 +313,11 @@
                 }
             }
         }
-
-
-        s360.setDefaults = function(options){
-            self.extend(true,defaults,options);
-        };
-        s360.easeStop = function(now,callback){
-            var r = range > 0 ? 1 : -1;
-            if(now<Math.abs(range)*2){
-                opt.easeTime = setTimeout(function(){
-                    s360.turnRotate( range+r-Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)) );
-                    s360.easeStop(now+1,callback);
-                },Math.ceil(self.tween.Circ.easeIn(now,10,30,Math.abs(range)*2)));
-                //console.log(Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)),Math.ceil(self.tween.Circ.easeIn(now,1,20,Math.abs(range)*2)));
-            }else{
-                if(typeof callback != 'undefined'){
-                    callback.call(this,range);
-                }
-            }
-        };
-        s360.turnRotate = function(range){
-            opt.ele_ol.childNodes[opt.active - 1].style.visibility = "hidden";
-            opt.active -= range;
-            if(opt.active < 1){
-                opt.active = opt.imgTotal - 1 + opt.active % opt.imgTotal;
-            }
-            if(opt.active > opt.imgTotal){
-                opt.active = opt.active % opt.imgTotal +1;
-            }
-            opt.ele_ol.childNodes[opt.active - 1].style.visibility = "visible";
-        };
-        s360.autoPlay = function(f){
-            if(f){
-                s360.turnRotate(1);
-                opt.autoPlayTime = setTimeout(function(){
-                    s360.autoPlay(defaults.autoPlay);
-                },defaults.autoPlaySpeed)
-            }
-        };
-        s360.autoPlay(defaults.autoPlay);
     }
     BigEye.prototype.show360 = function(options){
         return new Show360(options);
     };
+    // 注册事件
     BigEye.prototype.addEvent = function(ele,name,handle){
         var self = this;
         if(typeof ele.nodeType == 'undefined'){
@@ -310,6 +343,7 @@
         ele.addEventListener(name,handle,false);
         return ele;
     };
+    // 删除事件
     BigEye.prototype.removeEvent = function(ele,name,handle){
         var self = this;
         if(typeof ele.nodeType == 'undefined'){
@@ -318,7 +352,7 @@
         ele.removeEventListener(name,handle,false);
         return ele;
     };
-
+    // 数据类型判断
     BigEye.prototype.typeOf = function(val){
         var type = typeof val;
         if(typeof val != 'object'){
@@ -327,6 +361,7 @@
             return val == null ? 'null' : Object.prototype.toString.call(val).slice(8,-1).toLowerCase();
         }
     };
+    // 继承方法，支持深度继承
     BigEye.prototype.extend = function(flag){
         var self = this;
         var start = 0;
@@ -357,9 +392,33 @@
         }
 
     };
+    // 设备判断(简)
     BigEye.prototype.platform = function(){
         return navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i);
     };
+    // 元素内坐标计算
+    BigEye.prototype.getElementMouseCoords = function(e,ele){
+        var o = ele,
+            t = 0,
+            l = 0;
+        while(o.tagName != 'BODY'){
+            t += o.offsetTop;
+            l += o.offsetLeft;
+            o = o.offsetParent;
+        }
+        var w = ele.clientWidth,
+            h = ele.clientHeight,
+            x = e.pageX,
+            y = e.pageY,
+            ot = t,
+            ol = l,
+            r = {x:0,y:0};
+        console.log(ot,ol);
+        r.x = (x - ol) < 0 ? 0 : (x - ol) > w ? w : x - ol;
+        r.y = (y - ot) < 0 ? 0 : (y - ot) > h ? h : y - ot;
+        return r;
+    };
+    // 缓动方法
     BigEye.prototype.tween = (function(){
         return {
             Linear: function(t,b,c,d){ return c*t/d + b; },
