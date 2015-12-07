@@ -23,7 +23,6 @@
                     s360.turnRotate( range+r-Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)) );
                     s360.easeStop(now+1,callback);
                 },Math.ceil(self.tween.Circ.easeIn(now,10,30,Math.abs(range)*2)));
-                //console.log(Math.ceil(self.tween.Circ.easeOut(now,0,range,Math.abs(range)*2)),Math.ceil(self.tween.Circ.easeIn(now,1,20,Math.abs(range)*2)));
             }else{
                 if(typeof callback != 'undefined'){
                     callback.call(this,range);
@@ -53,7 +52,6 @@
                 defaults.width = width == '' ? '100%' : width;
                 defaults.height = height == '' ? '100%' : height;
             }
-            console.log(defaults.width,defaults.height);
         };
         s360.autoPlay = function(f){
             if(f){
@@ -413,7 +411,6 @@
             ot = t,
             ol = l,
             r = {x:0,y:0};
-        console.log(ot,ol);
         r.x = (x - ol) < 0 ? 0 : (x - ol) > w ? w : x - ol;
         r.y = (y - ot) < 0 ? 0 : (y - ot) > h ? h : y - ot;
         return r;
