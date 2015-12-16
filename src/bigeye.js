@@ -11,8 +11,6 @@
     function Show360(options){
         var s360 = this;
 
-
-
         s360.setDefaults = function(options){
             self.extend(true,defaults,options);
         };
@@ -67,8 +65,10 @@
             width: '',                  // 元素宽度，不设置为自适应
             height: '',                 // 元素高度，不设置为自适应
             rotateRange: '2',           // 旋转单张角度
+            sensibility: '2',           // 灵敏度，描述鼠标滑动距离和角度的关系
             imgPath: 'pic/',            // 图片相对路径
-            imgPrefix: 'threesixty_',   // 图片名称前缀
+            imgPrefix: 'show360_',   // 图片名称前缀
+            reserveNumberLength: '0',
             imgType: 'jpg',             // 图片类型
 
             startIndex: '1',            // 从第几张图开始
@@ -82,6 +82,8 @@
         };
         self.extend(true,defaults,options);
         s360.setSize(defaults.width,defaults.height);
+
+        s360.opt = defaults;
         var consts = {
             rotate: 360
         };
@@ -190,7 +192,7 @@
                     eleX = coords.x;
                     return;
                 }
-                range = parseInt((coords.x - eleX) / defaults.rotateRange);
+                range = parseInt((coords.x - eleX) / defaults.sensibility);
                 s360.turnRotate(range);
                 eleX = coords.x;
             }else{
@@ -280,7 +282,7 @@
                 }
                 li.setAttribute('style','position:absolute; left:0; top:0; width:100%; height:100%;'+visibility);
                 var img = new Image();
-                img.src = defaults.imgPath + defaults.imgPrefix + i + '.' + defaults.imgType;
+                img.src = defaults.imgPath + defaults.imgPrefix + self.reserveNumber(defaults.reserveNumberLength,i) + '.' + defaults.imgType;
                 img.setAttribute('style','width:100%;');
                 li.appendChild(img);
                 imgLoadState.imgArr.push(img);
@@ -393,6 +395,15 @@
     // 设备判断(简)
     BigEye.prototype.platform = function(){
         return navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i);
+    };
+    // 保留位计算
+    BigEye.prototype.reserveNumber = function(l,n){
+        var num = n + '',
+            c = l - num.length;
+        for(var i = 0; i < c; i++){
+            num = '0' + num;
+        }
+        return num;
     };
     // 元素内坐标计算
     BigEye.prototype.getElementMouseCoords = function(e,ele){
