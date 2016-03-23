@@ -166,18 +166,6 @@
                 }
                 opt.moveLock = true;
             }
-            function getElementMouseCoords(e,ele){
-                var w = ele.clientWidth,
-                    h = ele.clientHeight,
-                    x = e.pageX,
-                    y = e.pageY,
-                    ot = ele.offsetTop,
-                    ol = ele.offsetLeft,
-                    r = {x:0,y:0};
-                r.x = (x - ol) < 0 ? 0 : (x - ol) > w ? w : x - ol;
-                r.y = (y - ot) < 0 ? 0 : (y - ot) > h ? h : y - ot;
-                return r;
-            }
             function mouseMove(e){
                 e.preventDefault();
                 var coords = {
@@ -422,6 +410,10 @@
             r = {x:0,y:0};
         r.x = (x - ol) < 0 ? 0 : (x - ol) > w ? w : x - ol;
         r.y = (y - ot) < 0 ? 0 : (y - ot) > h ? h : y - ot;
+
+        //r.x = e.offsetX > w ? w : e.offsetX;
+        //r.y = e.offsetY > h ? h : e.offsetY;
+        //console.log(r,e.offsetX, e.offsetY)
         return r;
     };
     // 缓动方法
